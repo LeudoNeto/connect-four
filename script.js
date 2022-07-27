@@ -39,18 +39,27 @@ function check_game()
 
 circles = Array.from(document.querySelectorAll('td button'));
 
+const sleep = m => new Promise(r => setTimeout(r, m))
+
 let clicks = 0;
+match_clicks = [];
 for (circle of circles)
 {
     circle.line = Math.floor(circles.indexOf(circle) / 7);
     circle.column = circles.indexOf(circle) % 7;
+    circle.style.background = 'gray';
     circle.addEventListener('click',function()
     {
         if (game[0][this.column] === '')
         {
-            for (let o = 0; o < 6; o++)
+            (async () => {
+            this.clicks = clicks;
+            match_clicks.push(this.clicks);
+            for (let o = 0; o < 5; o++)
             {
-                if (clicks % 2 === 0)
+                if (circles[7*o + this.column].style.background == 'gray')
+                {
+                if (this.clicks % 2 !== 0)
                 {
                     circles[7*o + this.column].style.background = 'blue';
                 }
@@ -58,7 +67,16 @@ for (circle of circles)
                 {
                     circles[7*o + this.column].style.background = 'red';
                 }
+                }
+                if (circles[7*(o+1) + this.column].style.background == 'gray')
+                {
+                    await sleep(200)
+                    circles[7*o + this.column].style.background = 'gray'
+                    if (this.clicks % 2 === 0) {circles[7*(o+1) + this.column].style.background = 'red'}
+                    else {circles[7*(o+1) + this.column].style.background = 'blue'}
+                }
             }
+            })()
         clicks++;
         }
     })
